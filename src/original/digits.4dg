@@ -1,0 +1,142 @@
+func display_score(var num)
+  var hundreds;
+  var tens;
+  var ones;
+
+  hundreds := num / 100;
+  tens := (num-hundreds*100) / 10;
+  ones := num-hundreds*100-tens*10;
+
+  var digits[] := [238,72,186,218,92,214,246,74,254,222];
+
+  var offset;
+
+  offset := 0;
+  num := digits[hundreds];
+  gosub digit;
+  offset := 20;
+  num := digits[tens];
+  gosub digit;
+  offset := 40;
+  num := digits[ones];
+  gosub digit;
+
+  return;
+
+  digit:
+    if ((num & 2) != 0)
+      if (gfx_GetPixel(133+offset, 0) == BLACK)
+        txt_FGcolour(normal_colors[17]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(133+offset,0);
+        putch(17);
+      endif
+    else
+      if (gfx_GetPixel(133+offset, 0) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(133+offset,0);
+        putch(17);
+      endif
+    endif
+
+    if ((num & 4) != 0)
+      if (gfx_GetPixel(131+offset, 1) == BLACK)
+        txt_FGcolour(normal_colors[17]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(131+offset,1);
+        putch(14);
+      endif
+    else
+      if (gfx_GetPixel(131+offset, 1) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(131+offset,1);
+        putch(14);
+      endif
+    endif
+
+    if ((num & 8) != 0)
+      if (gfx_GetPixel(146+offset, 3) == BLACK)
+        txt_FGcolour(normal_colors[17]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(146+offset,1);
+        putch(16);
+      endif
+    else
+      if (gfx_GetPixel(146+offset, 3) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(146+offset,1);
+        putch(16);
+      endif
+    endif
+
+    if ((num & 16) != 0)
+      if (gfx_GetPixel(134+offset, 14) == BLACK)
+        txt_FGcolour(normal_colors[17]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(133+offset,14);
+        putch(15);
+      endif
+    else
+      if (gfx_GetPixel(134+offset, 14) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(133+offset,14);
+        putch(15);
+      endif
+    endif
+
+    if ((num & 32) != 0)
+      if (gfx_GetPixel(131+offset, 16) == BLACK)
+        txt_FGcolour(normal_colors[17]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(131+offset,16);
+        putch(14);
+      endif
+    else
+      if (gfx_GetPixel(131+offset, 16) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(131+offset,16);
+        putch(14);
+      endif
+    endif
+
+    if ((num & 64) != 0)
+      if (gfx_GetPixel(146+offset, 18) == BLACK)
+        txt_FGcolour(normal_colors[17]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(146+offset,16);
+        putch(16);
+      endif
+    else
+      if (gfx_GetPixel(146+offset, 18) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(146+offset,16);
+        putch(16);
+      endif
+    endif
+
+    if ((num & 128) != 0)
+      if (gfx_GetPixel(135+offset, 28) == BLACK)
+        txt_FGcolour(normal_colors[17]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(133+offset,28);
+        putch(25);
+      endif
+    else
+      if (gfx_GetPixel(135+offset, 28) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(133+offset,28);
+        putch(25);
+      endif
+    endif
+
+  endsub;
+
+endfunc
+

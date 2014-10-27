@@ -1,0 +1,356 @@
+
+func display_bomb(var x, var y)
+  var i; 
+  for (i := 0; i < 6; i++) 
+    var offset := 0;
+    if (i >= 2) offset := 40*(i-1);
+    if (i >= 1) offset += 14;
+    if (i == y)
+      if (gfx_GetPixel(18+x*35,50+offset) == BLACK)
+        txt_FGcolour(normal_colors[8]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(18+x*35,49+offset);
+        putch(8);
+      endif
+    else
+      if (gfx_GetPixel(18+x*35,50+offset) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(18+x*35,49+offset);
+        putch(8);
+      endif
+    endif
+  next
+endfunc
+
+func display_person(var x, var level)
+  var i;
+  for(i := 0; i < 4; i++)
+    if (i == level)
+      if (gfx_GetPixel(16+x*35,210-i*40) == BLACK)
+        txt_FGcolour(normal_colors[20]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(14+x*35,210-i*40);
+        putch(20);
+      endif
+    else
+      if (gfx_GetPixel(16+x*35,210-i*40) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(14+x*35,210-i*40);
+        putch(20);
+      endif
+    endif
+  next
+endfunc
+
+func display_building(var x, var level)
+  var i;
+  for (i := 0; i < 4; i++)
+    if (i == level-1)
+      if(gfx_GetPixel(8+x*35,220-i*40) == BLACK)
+        txt_FGcolour(normal_colors[11]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(8+x*35,220-i*40);
+        putch(11);
+      endif
+    else
+      if(gfx_GetPixel(8+x*35,220-i*40) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(8+x*35,220-i*40);
+        putch(11);
+      endif
+    endif
+    if (i < level)
+      if(gfx_GetPixel(3+x*35,220-i*40) == BLACK)
+        txt_FGcolour(normal_colors[10]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(3+x*35,220-i*40);
+        putch(10);
+      endif
+    else
+      if(gfx_GetPixel(3+x*35,220-i*40) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(3+x*35,220-i*40);
+        putch(10);
+      endif
+    endif
+  next
+  return;
+endfunc
+
+func display_waves(var level, var splash)
+  if (level >= 5) splash := 0;
+
+  var j;
+  for (j := 0; j < 9; j++)
+    var i; 
+    for (i :=0; i < 6; i++)
+      var of;
+      of := (i-1)*40;
+      if (i == 0) of := -28;
+      if (i == 5) of := 172;
+      if (i == level)
+        if (gfx_GetPixel(14+j*35,205-of) == BLACK)
+          txt_FGcolour(normal_colors[24]);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(6+j*35,205-of);
+          putch(24);
+        endif
+        if (splash != 0)
+          if (gfx_GetPixel(10+j*35,202-of) == BLACK)
+            txt_FGcolour(normal_colors[23]);
+            txt_Opacity(TRANSPARENT);
+            gfx_MoveTo(6+j*35,202-of);
+            putch(23);
+          endif
+        else
+          if (gfx_GetPixel(10+j*35,202-of) != BLACK && i < 5 )
+            txt_FGcolour(BLACK);
+            txt_Opacity(TRANSPARENT);
+            gfx_MoveTo(6+j*35,202-of);
+            putch(23);
+          endif
+        endif
+      else
+        if (gfx_GetPixel(14+j*35,205-of) != BLACK)
+          txt_FGcolour(BLACK);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(6+j*35,205-of);
+          putch(24);
+        endif
+        if (gfx_GetPixel(10+j*35,202-of) != BLACK && i < 5)
+          txt_FGcolour(BLACK);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(6+j*35,202-of);
+          putch(23);
+        endif
+      endif
+    next
+  next
+endfunc
+
+func display_blimp(var level, var right, var shield)
+  var i; 
+  for (i := 0; i < 4; i++)
+    if (level == i)
+      if (gfx_GetPixel(151,192-40*i) == BLACK)
+        txt_FGcolour(normal_colors[1]);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(147,188-40*i);
+        putch(1);
+      endif
+      if (shield != 0)
+        if (gfx_GetPixel(159,192-40*i) == BLACK)
+          txt_FGcolour(normal_colors[4]);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(158,192-40*i);
+          putch(4);
+        endif
+      else
+        if (gfx_GetPixel(159,192-40*i) != BLACK)
+          txt_FGcolour(BLACK);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(158,192-40*i);
+          putch(4);
+        endif
+      endif
+      if (right != 0)
+        if (gfx_GetPixel(146,189-40*i) == BLACK)
+          txt_FGcolour(normal_colors[6]);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(146,189-40*i);
+          putch(6);
+        endif
+        if (gfx_GetPixel(172,189-40*i) != BLACK)
+          txt_FGcolour(BLACK);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(171,189-40*i);
+          putch(5);
+        endif
+        if (gfx_GetPixel(164,201-40*i) == BLACK)
+          txt_FGcolour(normal_colors[3]);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(161,201-40*i);
+          putch(3);
+        endif
+        if (gfx_GetPixel(154,201-40*i) != BLACK)
+          txt_FGcolour(BLACK);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(154,201-40*i);
+          putch(2);
+        endif
+      else
+        if (gfx_GetPixel(146,189-40*i) != BLACK)
+          txt_FGcolour(BLACK);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(146,189-40*i);
+          putch(6);
+        endif
+        if (gfx_GetPixel(172,189-40*i) == BLACK)
+          txt_FGcolour(normal_colors[5]);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(171,189-40*i);
+          putch(5);
+        endif
+        if (gfx_GetPixel(164,201-40*i) != BLACK)
+          txt_FGcolour(BLACK);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(161,201-40*i);
+          putch(3);
+        endif
+        if (gfx_GetPixel(154,201-40*i) == BLACK)
+          txt_FGcolour(normal_colors[2]);
+          txt_Opacity(TRANSPARENT);
+          gfx_MoveTo(154,201-40*i);
+          putch(2);
+        endif
+      endif
+    else
+      if (gfx_GetPixel(151,192-40*i) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(147,188-40*i);
+        putch(1);
+      endif
+      if (gfx_GetPixel(159,192-40*i) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(158,192-40*i);
+        putch(4);
+      endif
+      if (gfx_GetPixel(172,189-40*i) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(171,189-40*i);
+        putch(5);
+      endif
+      if (gfx_GetPixel(146,189-40*i) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(146,189-40*i);
+        putch(6);
+      endif
+      if (gfx_GetPixel(154,201-40*i) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(154,201-40*i);
+        putch(2);
+      endif
+      if (gfx_GetPixel(164,201-40*i) != BLACK)
+        txt_FGcolour(BLACK);
+        txt_Opacity(TRANSPARENT);
+        gfx_MoveTo(161,201-40*i);
+        putch(3);
+      endif
+    endif
+  next
+endfunc
+
+func display_camel(var x, var y, var orient)
+  if (orient == 0)
+    if (gfx_GetPixel(7+x*35,54-y*14) != BLACK)
+     txt_FGcolour(BLACK);
+     txt_Opacity(TRANSPARENT);
+     gfx_MoveTo(3+x*35,54-y*14);
+     putch(12);
+    endif
+    if (gfx_GetPixel(28+x*35,54-y*14) != BLACK)
+     txt_FGcolour(BLACK);
+     txt_Opacity(TRANSPARENT);
+     gfx_MoveTo(19+x*35,54-y*14);
+     putch(13);
+    endif
+  endif
+  if (orient == 1)
+    if (gfx_GetPixel(7+x*35,54-y*14) == BLACK)
+     txt_FGcolour(normal_colors[12]);
+     txt_Opacity(TRANSPARENT);
+     gfx_MoveTo(3+x*35,54-y*14);
+     putch(12);
+    endif
+    if (gfx_GetPixel(28+x*35,54-y*14) != BLACK)
+     txt_FGcolour(BLACK);
+     txt_Opacity(TRANSPARENT);
+     gfx_MoveTo(19+x*35,54-y*14);
+     putch(13);
+    endif
+  endif
+  if (orient == 2)
+    if (gfx_GetPixel(7+x*35,54-y*14) != BLACK)
+     txt_FGcolour(BLACK);
+     txt_Opacity(TRANSPARENT);
+     gfx_MoveTo(3+x*35,54-y*14);
+     putch(12);
+    endif
+    if (gfx_GetPixel(28+x*35,54-y*14) == BLACK)
+     txt_FGcolour(normal_colors[13]);
+     txt_Opacity(TRANSPARENT);
+     gfx_MoveTo(19+x*35,54-y*14);
+     putch(13);
+    endif
+  endif
+endfunc
+
+func display_high(var high)
+  txt_FontID(big);
+  if(high != 0)
+    if(gfx_GetPixel(194,0) == BLACK)
+      txt_FGcolour(big_colors[1]);
+      txt_Opacity(TRANSPARENT);
+      gfx_MoveTo(193,0);
+      putch(1);
+    endif
+  else
+    if(gfx_GetPixel(194,0) != BLACK)
+      txt_FGcolour(BLACK);
+      txt_Opacity(TRANSPARENT);
+      gfx_MoveTo(193,0);
+      putch(1);
+    endif
+  endif
+  txt_FontID(normal);
+endfunc
+
+func display_gameover(var gameover)
+  txt_FontID(big);
+  if(gameover != 0)
+    if(gfx_GetPixel(194,8) == BLACK)
+      txt_FGcolour(big_colors[2]);
+      txt_Opacity(TRANSPARENT);
+      gfx_MoveTo(193,8);
+      putch(2);
+    endif
+  else
+    if(gfx_GetPixel(194,8) != BLACK)
+      txt_FGcolour(BLACK);
+      txt_Opacity(TRANSPARENT);
+      gfx_MoveTo(193,8);
+      putch(2);
+    endif
+  endif
+  txt_FontID(normal);
+endfunc
+
+func display_dagon(var show)
+  txt_FontID(huge);
+  if (show != 0)
+   if (gfx_GetPixel(267,14) == BLACK)
+    txt_FGcolour(23755);
+    txt_Opacity(TRANSPARENT);
+    gfx_MoveTo(192,0);
+    putch(1);
+   endif
+  else
+   if (gfx_GetPixel(267,14) != BLACK)
+    txt_FGcolour(BLACK);
+    txt_Opacity(TRANSPARENT);
+    gfx_MoveTo(192,0);
+    putch(1);
+   endif
+  endif
+  txt_FontID(normal);
+endfunc
+

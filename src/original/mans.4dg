@@ -1,0 +1,68 @@
+func display_mans(var num)
+
+  var i;
+  for (i := 0; i < 8; i++) 
+    if (i < num)
+     if (gfx_GetPixel(5+i*13,4) == BLACK)
+      gfx_MoveTo(0+i*13,2);
+      txt_FGcolour(normal_colors[21]);
+      txt_Opacity(TRANSPARENT);
+      putch(21);
+     endif
+    else
+     if (gfx_GetPixel(5+i*13,4) != BLACK)
+      gfx_MoveTo(0+i*13,2);
+      txt_FGcolour(BLACK);
+      txt_Opacity(TRANSPARENT);
+      putch(21);
+     endif
+    endif
+  next
+
+  return;
+endfunc
+
+func display_blimps(var num)
+
+  var i;
+  for (i := 0; i < 3; i++) 
+    if (i < num)
+     if (gfx_GetPixel(9+i*38,16) == BLACK)
+      gfx_MoveTo(0+i*38,16);
+      txt_FGcolour(normal_colors[7]);
+      txt_Opacity(TRANSPARENT);
+      putch(7);
+     endif
+    else
+     if (gfx_GetPixel(9+i*38,16) != BLACK)
+      gfx_MoveTo(0+i*38,16);
+      txt_FGcolour(BLACK);
+      txt_Opacity(TRANSPARENT);
+      putch(7);
+     endif
+    endif
+  next
+
+  return;
+endfunc
+
+func display_shield(var num)
+  if (num != 0)
+   if (gfx_GetPixel(115,10) == BLACK)
+    gfx_MoveTo(108,5);
+    txt_FGcolour(normal_colors[22]);
+    txt_Opacity(TRANSPARENT);
+    putch(22);
+   endif
+  else
+   if (gfx_GetPixel(115,10) != BLACK)
+    gfx_MoveTo(108,5);
+    txt_FGcolour(BLACK);
+    txt_Opacity(TRANSPARENT);
+    putch(22);
+   endif
+  endif
+  
+  return;
+endfunc
+

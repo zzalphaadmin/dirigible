@@ -1,0 +1,456 @@
+#platform "uLCD-24PTU"
+
+#MODE RUNFLASH
+
+#inherit "4DGL_16bitColours.fnc"
+#inherit "normal.4dg"
+#inherit "big.4dg"
+#inherit "digits.4dg"
+#inherit "mans.4dg"
+#inherit "play.4dg"
+#inherit "huge.4dg"
+
+#constant PLAYING := 0, DYING := 1, DEAD := 2
+
+var i;
+var j;
+var k;
+var l;
+
+var once := 0;
+
+var world[] := [0,0,0,0,0,0,0,0,0,
+               1,2,1,2,1,2,1,2,1,
+               0,1,2,3,4,3,2,1,0,
+               1,2,1,2,1,2,1,2,1,
+               0,0,0,0,0,0,0,0,0];
+
+var oldbus;
+var dirty := 255;
+var bus := 224;
+
+var up_down_bias := 0;
+
+func read_bus()
+  oldbus := bus;
+  bus := bus_Read();
+  bus |= 224;
+  if (up_down_bias != 0)
+    if ((bus & 1) == 0 || (bus & 4) == 0)
+      bus |= 2;
+      bus |= 8;
+    endif
+  else
+    if ((bus & 2) == 0 || (bus & 8) == 0)
+      bus |= 1;
+      bus |= 4;
+    endif
+  endif
+  if (bus != oldbus)
+    if ((bus & 1) == 0) dirty &= 254;
+    if ((bus & 2) == 0) dirty &= 253;
+    if ((bus & 4) == 0) dirty &= 251;
+    if ((bus & 8) == 0) dirty &= 247;
+    if ((bus & 16) == 0) dirty &= 239;
+  endif
+  sys_SetTimer(TIMER0, 16);
+endfunc
+
+var state := PLAYING;
+
+var camel_elapsed := 0;
+
+var sea_level := 0;
+var splash := 0;
+var splash_elapsed := 0;
+var sea_elapsed := 0;
+var bomb_elapsed := 0;
+
+var elapsed := 0;
+var now;
+var before;
+
+var victims_x[] := [0,0,0,0,0,0,0,0];
+var victims_y[] := [0,0,0,0,0,0,0,0];
+
+var camel_x[] := [45,4,21,16,30,10];
+var camel_y[] := [0,1,0,1,0,1];
+var camel_dir[] := [-1,1,-1,1,-1,1,-1];
+var bombs_x[] := [0,0,0,0,0,0];
+var bombs_y[] := [-1,-1,-1,-1,-1,-1];
+var bomb_i := 0;
+
+var score := 0;
+var highscore := 1;
+
+var blimps := 3;
+var shield := 0;
+var mans := 0;
+
+var blimp_x := 4;
+var blimp_y := 0;
+var blimp_right := 1;
+
+func hit(var guardable)
+  if (state == DEAD) return;
+
+  snd_Stop();
+  file_PlayWAV("f09.wav");
+  if (shield == 0 || guardable == 0)
+    blimps -= 1;
+  endif
+  shield := 0;
+  mans := 0;
+  for (i := 0; i < sizeof(victims_x); i++)
+    if (victims_x[i] == -1) victims_x[i] := 0;
+  next
+endfunc
+
+func reset()
+  once := 0;
+  snd_Stop();
+  file_PlayWAV("f07.wav");
+  state := PLAYING;
+  sea_level := 0;
+  splash := 0;
+  splash_elapsed := 0;
+  camel_elapsed := 0;
+  sea_elapsed := 0;
+  bomb_elapsed := 0;
+  elapsed := 0;
+  for (i := 0; i < sizeof(victims_x) ; i++)
+    victims_x[i] := 0;
+    victims_y[i] := 0;
+  next
+  for (i := 0; i < sizeof(bombs_x) ; i++)
+    bombs_x[i] := 0;
+    bombs_y[i] := -1;
+  next
+  bomb_i := 0;
+  score := 0;
+  blimps := 3;
+  shield := 0;
+  mans := 0;
+  blimp_x := 4;
+  blimp_y := 0;
+  blimp_right := 1;
+  before := sys_T();
+endfunc
+
+func main()
+
+  /* setup */
+
+  gfx_ScreenMode(LANDSCAPE);
+  touch_Set(1);
+  gfx_Set(BACKGROUND_COLOUR, BLACK);
+  txt_FontID(normal);
+  txt_FGcolour(WHITE);
+  gfx_MoveTo(0,0);
+  gfx_Cls();
+
+
+  if( !file_Mount() )
+    repeat
+      pause(200);
+      gfx_Cls();
+      pause(200);
+    until( file_Mount() );
+  endif
+
+  sys_SetTimerEvent(TIMER0, read_bus);
+  sys_SetTimer(TIMER0, 16);
+
+  snd_Volume(127);
+
+  SEED(5);
+  /* setup */
+
+  reset();
+
+  before := sys_T();
+  repeat
+    now := sys_T();
+    elapsed := now - before;
+    if (elapsed > 150)
+      splash_elapsed += elapsed;
+      sea_elapsed += elapsed;
+      camel_elapsed += elapsed;
+      bomb_elapsed += elapsed;
+      elapsed -= 150;
+
+      /* logic */
+
+      if (state == DEAD && (dirty & 16) == 0)
+        reset();
+      endif
+
+      if (state == DEAD) dirty := 255;
+
+      if ((dirty & 2) == 0) 
+        i := blimp_x;
+        blimp_x += 1;
+        if (blimp_x >= sizeof(world)) blimp_x := blimp_x - sizeof(world);
+        blimp_right := 1;
+        if (world[blimp_x] > blimp_y+1) 
+          blimp_x := i;
+          hit(1);
+        endif
+      endif 
+      if ((dirty & 8) == 0) 
+        i := blimp_x;
+        blimp_x -= 1;
+        if (blimp_x < 0) blimp_x := sizeof(world) + blimp_x;
+        blimp_right := 0;
+        if (world[blimp_x] > (blimp_y+1)) 
+          blimp_x := i;
+          hit(1);
+        endif
+      endif
+      if ((dirty & 1) == 0) 
+        blimp_y += 1;
+      endif
+      if (blimp_y > 3) blimp_y := 3;
+      if ((dirty & 4) == 0) 
+        i := blimp_y;
+        blimp_y -= 1;
+        if (blimp_y < 0) blimp_y := 0;
+        if (blimp_y < sea_level) blimp_y := sea_level-1;
+        if (world[blimp_x] > (blimp_y+1)) blimp_y := i;
+      endif
+      if ((dirty & 16) == 0 && mans > 0 && world[blimp_x] == 0)
+        for(i := 0; i < sizeof(victims_x); i++)
+          if(victims_x[i] == -1)
+            victims_x[i] := blimp_x;
+            victims_y[i] := blimp_y;
+            mans -= 1;
+            sea_elapsed -= 700;
+            if (sea_elapsed < 0) sea_elapsed := 0;
+            break;
+          endif
+        next
+      endif
+      if ((dirty & 16) == 0 && mans > 0 && world[blimp_x] != 0 && shield == 0)
+        mans := 0;
+        shield := 1;
+        snd_Stop();
+        file_PlayWAV("08.wav");
+        for(i := 0; i < sizeof(victims_x); i++)
+          victims_x[i] := 0;
+        next
+      endif
+      dirty := 255;
+
+      for (i := 0; i < sizeof(victims_x); i++)
+        if (victims_x[i] == blimp_x && blimp_y+1 == world[blimp_x] && mans <= 8)
+          victims_x[i] := -1;
+          mans += 1;
+          snd_Stop();
+          file_PlayWAV("f15.wav");
+        endif
+        if (victims_x[i] == 0 && sea_level < 4)
+          while (world[victims_x[i]] <= 1 || world[victims_x[i]] <= sea_level)
+            victims_x[i] := ABS(RAND() % sizeof(world));
+            victims_y[i] := world[victims_x[i]]-1;
+          wend
+        endif
+        if (state != DEAD && (world[victims_x[i]] == 0 && victims_x[i] != -1 && victims_x[i] != -2))
+          victims_y[i] -= 1;
+          if (victims_y[i] < 0)
+            victims_x[i] := 0;
+            score += 1;
+            snd_Stop();
+            file_PlayWAV("f06.wav");
+          endif 
+        endif
+        if (world[victims_x[i]] != 0 && victims_x[i] != -1 && sea_level >= world[victims_x[i]])
+          victims_x[i] := -2;
+        endif
+      next
+
+      if (blimps <= 0) 
+        state := DEAD;
+        if (once == 0) 
+          snd_Stop();
+          file_PlayWAV("f05.wav");
+          once := 1;
+        endif
+      endif
+      if (state == DEAD) blimp_y := -1;
+
+      if (score > highscore) highscore := score;
+
+      for (i := 0; i < sizeof(camel_x); i++)
+        if (camel_x[i] - blimp_x == 1 || blimp_x - camel_x[i] == 1)
+          l := 0;
+          for (j := 0; j < sizeof(bombs_x); j++)
+            if (bombs_x[j] == camel_x[i]) l := 1;
+          next
+          if (l == 0)
+            bomb_i += 1;
+            if (bomb_i >= sizeof(bombs_x)) bomb_i := 0;
+            bombs_x[bomb_i] := camel_x[i];
+            if (camel_y[i] == 0)
+              bombs_y[bomb_i] := 1;
+            else
+              bombs_y[bomb_i] := 0;
+            endif
+          endif
+        endif
+      next
+
+      for (i := 0; i < sizeof(bombs_x); i++)
+        if (blimp_x == bombs_x[i])
+          if ((blimp_y == 0 && bombs_y[i] == 4) || (blimp_y == 1 && bombs_y[i] == 3) || (blimp_y == 2 && bombs_y[i] == 2) || (blimp_y == 3 && bombs_y[i] == 1))
+            bombs_x[i] := 0;
+            bombs_y[i] := -1;
+            hit(1);
+          endif
+        endif
+      next
+
+      /* logic */
+
+      /* timers */
+      if (splash_elapsed > 500)
+        splash_elapsed -= 500;
+        if (splash != 0)
+          splash := 0;
+        else
+          splash := 1;
+        endif
+      endif
+
+      if (camel_elapsed > 250)
+        camel_elapsed -= 250;
+        for (i := 0; i < sizeof(camel_x); i++)
+          camel_x[i] += camel_dir[i];
+          if (camel_x[i] >= sizeof(world))
+            camel_x[i] := sizeof(world)-1; 
+            camel_dir[i] *= -1;
+          endif
+          if (camel_x[i] < 0)
+            camel_x[i] := 1;
+            camel_dir[i] *= -1;
+          endif
+        next
+      endif
+
+      if (sea_elapsed > 8000)
+        sea_elapsed -= 8000;
+        if (sea_level != 5) sea_level += 1;
+        if (blimp_y < sea_level && state != DEAD) 
+          blimp_y := sea_level-1;
+          hit(0);
+        endif
+        if (sea_level == 5) blimps := 0;
+        //sea_level 5 is fatal
+      endif
+
+      if (bomb_elapsed > 300)
+        bomb_elapsed -= 300;
+        for (i := 0; i < sizeof(bombs_x) ; i++)
+          if (bombs_y[i] != -1)
+            bombs_y[i] += 1;
+          endif
+          if (bombs_y[i] > 5)
+            bombs_x[i] := 0;
+            bombs_y[i] := -1;
+          endif
+        next
+      endif
+      /* timers */
+
+      /* visual */
+      display_score(score);
+      display_mans(mans);
+      display_blimps(blimps);
+      display_gameover(state == DEAD);
+      if (score == highscore)
+        display_high(1);
+      else
+        display_high(0);
+      endif
+      
+      display_blimp(blimp_y,blimp_right,shield);
+      display_shield(shield);
+
+      for (i := 0; i < 9; i++)
+        j := blimp_x - 4 + i;
+        if (j < 0) j := sizeof(world) - j;
+        if (j >= sizeof(world)) j := j - sizeof(world);
+        display_building(i,world[j]);
+        l := 0;
+        for (k := 0; k < sizeof(victims_x); k++)
+          if (victims_x[k] == j)
+            display_person(i,victims_y[k]);
+            l := 1;
+          endif
+        next
+        if (l != 1) display_person(i,-1);
+      next
+
+      display_waves(sea_level,splash);
+
+      display_dagon(sea_level == 5);
+
+      if (state != DEAD)
+        for (i := 0; i < 9; i++)
+          k := 0;
+          for (j := 0; j < sizeof(camel_x) ; j++)
+            l := blimp_x-4+i;
+            if (l >= sizeof(world)) l := l - sizeof(world);
+            if (l < 0) l := sizeof(world) - l;
+            if (l == camel_x[j] && camel_y[j] == 1)
+              k := 1;
+              if (camel_dir[j] > 0)
+                display_camel(i,1,2);
+              else
+                display_camel(i,1,1);
+              endif
+            endif
+          next
+          if (k == 0) display_camel(i,1,0);
+          k := 0;
+          for (j := 0; j < sizeof(camel_x) ; j++)
+            l := blimp_x-4+i;
+            if (l >= sizeof(world)) l := l - sizeof(world);
+            if (l < 0) l := sizeof(world) - l;
+            if (l == camel_x[j] && camel_y[j] == 0)
+              k := 1;
+              if (camel_dir[j] > 0)
+                display_camel(i,0,2);
+              else
+                display_camel(i,0,1);
+              endif
+            endif
+          next
+          if (k == 0) display_camel(i,0,0);
+        next
+      else
+        for (i := 0; i < 9; i++)
+          for (j := 0; j < 2; j++)
+            display_camel(i,j,0);
+          next
+        next
+      endif
+
+      for(i := 0; i < 9; i++)
+        k := blimp_x-4+i;
+        l := 0;
+        for( j:= 0; j < sizeof(bombs_x); j++)
+          if(bombs_x[j] == k && state != DEAD)
+            display_bomb(i,bombs_y[j]);
+            l := 1;
+          endif
+        next
+        if (l == 0) display_bomb(i,-1);
+      next
+
+      /* visual */
+
+      before := sys_T();
+    endif
+  forever
+
+endfunc
