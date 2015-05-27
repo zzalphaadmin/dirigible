@@ -7,8 +7,6 @@ Dirigible!!! was Natural Alpha Electronics winning entry in the brIGDA 48 hour g
 
 ## On-line Version
 
-[an example](http://example.com/ "Title")
-
 We have created an HTML5-based simulator of [Dirigible!!!](http://montrose.is/dirigible "Dirigible!!!"), which you can play [here](http://montrose.is/dirigible "Dirigible!!!"). 
 
 ### About the On-Line Version
