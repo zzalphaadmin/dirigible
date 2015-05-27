@@ -15,7 +15,7 @@ The simulator was created by first writing Javascript versions of the custom 4DG
 
 The 3D model presented uses the same 3D parts and art resources (e.g. sideart, control overlay) as were used to print the 3D parts, produce wooden patterns, and stickers used in the actual assembly. Again, it should be close to a faithful adaptation. A gallery of photos of the actual units produced is available [here](http://tbd.com "TBD").
 
-To explore the case, use the left and right arrows that appear when you hover to the left and right of the unit. To play, simply click the unit when it is facing the front. The control keys are w,a,s,d and j or the arrow keys along with z.
+The control keys are w,a,s,d and j or the arrow keys along with z.
 
 ## Natural Alpha
 
