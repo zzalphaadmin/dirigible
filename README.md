@@ -3,7 +3,7 @@ Dirigible!!!
 
 Dirigible!!! was Natural Alpha Electronics winning entry in the brIGDA 48 hour game making challenge.
 
-Dagon demands sacrifices, lest he drown the city of Innsmouth. The flood has already begun. Fly your dirigible using the joystick. Fly into survivors on the tops of buildings to collect them. Use the button when flying over the open ocean to drop them into the sea, sacrificing them to Dagon. Use the fire button when flying over buildings to sacrifice them to yourself. This generates a shield for your craft. The faster you sacrifice citizens to Dagon, the slower the water will rise.
+Dagon demands sacrifices, lest he drown the city of Innsmouth. The flood has already begun. Fly your dirigible using the joystick. Fly into survivors on the tops of buildings to collect them. Use the button when flying over the open ocean to drop them into the sea, sacrificing them to Dagon. Use the fire button when flying over buildings (even buildings already under the water) to sacrifice them to yourself. This generates a shield for your craft. The faster you sacrifice citizens to Dagon, the slower the water will rise.
 
 # Dirigible!!!
 
